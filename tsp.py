@@ -124,13 +124,13 @@ def tweak(solution: np.array, *, pm: float = .1) -> np.array:
         rand = np.random.randint(0, 4)
 
         if rand == 0:
-            new_solution = swap(new_solution)
-        elif rand == 1:
             new_solution = scramble(new_solution)
+        elif rand == 1:
+            new_solution = swap(new_solution)
         elif rand == 2:
-            new_solution = insert(new_solution)
-        else:
             new_solution = inversion(new_solution)
+        else:
+            new_solution = insert(new_solution)
 
         p = np.random.random()
 
