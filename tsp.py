@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+from random import shuffle
 
 NUM_CITIES = 23
 STEADY_STATE = 1000
@@ -22,7 +23,8 @@ class Tsp:
         self._graph = nx.DiGraph()
         np.random.seed(seed)
         for c in range(num_cities):
-            self._graph.add_node(c, pos=(np.random.random(), np.random.random()))
+            self._graph.add_node(
+                c, pos=(np.random.random(), np.random.random()))
 
     def distance(self, n1, n2) -> int:
         pos1 = self._graph.nodes[n1]['pos']
@@ -57,16 +59,62 @@ class Tsp:
         return self._graph
 
 
+def swap(new_solution):
+
+    i1 = np.random.randint(0, new_solution.shape[0])
+    i2 = np.random.randint(0, new_solution.shape[0])
+    temp = new_solution[i1]
+    new_solution[i1] = new_solution[i2]
+    new_solution[i2] = temp
+
+    return new_solution
+
+
+def scramble(new_solution):
+
+    for i in range(np.random.randint(new_solution.shape[0])):
+        new_solution = swap(new_solution)
+
+    return new_solution
+
+
+def insert(new_solution):
+
+    i1 = np.random.randint(0, new_solution.shape[0])
+    i2 = np.random.randint(0, new_solution.shape[0])
+
+    while i1 == i2:
+        i2 = np.random.randint(0, new_solution.shape[0])
+
+    if i1 > i2:
+        tmp = i1
+        i1 = i2
+        i2 = tmp
+
+    tmp = list(new_solution[i1+1:i2])
+    new_solution[i1+1] = new_solution[i2]
+
+    for i in range(len(tmp)):
+        new_solution[i1+2+i] = tmp[i]
+
+    return new_solution
+
+
 def tweak(solution: np.array, *, pm: float = .1) -> np.array:
     new_solution = solution.copy()
     p = None
     while p is None or p < pm:
-        i1 = np.random.randint(0, solution.shape[0])
-        i2 = np.random.randint(0, solution.shape[0])
-        temp = new_solution[i1]
-        new_solution[i1] = new_solution[i2]
-        new_solution[i2] = temp
+        rand = np.random.randint(0, 3)
+
+        if rand == 0:
+            new_solution = swap(new_solution)
+        elif rand == 1:
+            new_solution = scramble(new_solution)
+        else:
+            new_solution = insert(new_solution)
+
         p = np.random.random()
+
     return new_solution
 
 
@@ -96,6 +144,7 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s', datefmt='%H:%M:%S')
+    logging.basicConfig(
+        format='[%(asctime)s] %(levelname)s: %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().setLevel(level=logging.INFO)
     main()
