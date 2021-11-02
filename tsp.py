@@ -94,8 +94,25 @@ def insert(new_solution):
     tmp = list(new_solution[i1+1:i2])
     new_solution[i1+1] = new_solution[i2]
 
-    for i in range(len(tmp)):
-        new_solution[i1+2+i] = tmp[i]
+    new_solution[i1+2:i2+1] = tmp
+
+    return new_solution
+
+
+def inversion(new_solution):
+
+    i1 = np.random.randint(0, new_solution.shape[0])
+    i2 = np.random.randint(0, new_solution.shape[0])
+
+    while i1 == i2:
+        i2 = np.random.randint(0, new_solution.shape[0])
+
+    if i1 > i2:
+        tmp = i1
+        i1 = i2
+        i2 = tmp
+
+    new_solution[i1:i2] = new_solution[i1:i2][::-1]
 
     return new_solution
 
@@ -104,14 +121,16 @@ def tweak(solution: np.array, *, pm: float = .1) -> np.array:
     new_solution = solution.copy()
     p = None
     while p is None or p < pm:
-        rand = np.random.randint(0, 3)
+        rand = np.random.randint(0, 4)
 
         if rand == 0:
             new_solution = swap(new_solution)
         elif rand == 1:
             new_solution = scramble(new_solution)
-        else:
+        elif rand == 2:
             new_solution = insert(new_solution)
+        else:
+            new_solution = inversion(new_solution)
 
         p = np.random.random()
 
